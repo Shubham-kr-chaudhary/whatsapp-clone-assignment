@@ -1,4 +1,5 @@
 
+
 import React, { useMemo, useState } from "react";
 import ChatListItem from "./ChatListItem";
 
@@ -8,25 +9,30 @@ export default function Sidebar({ chats, activeWA, onSelect, open, setOpen }) {
   // dedupe & sorted (safe)
   const uniqueChats = useMemo(() => {
     const map = new Map();
-    chats.forEach(c => map.set(c.wa_id, c));
+    (chats || []).forEach(c => map.set(c.wa_id, c));
     return Array.from(map.values()).sort((a,b)=>b.lastTime - a.lastTime);
   }, [chats]);
 
   const filtered = uniqueChats.filter(c => {
     if (!q) return true;
-    return c.wa_id.includes(q) || (c.lastText || "").toLowerCase().includes(q.toLowerCase());
+    return (c.wa_id || "").includes(q) || (c.lastText || "").toLowerCase().includes(q.toLowerCase());
   });
 
   return (
     <>
+      {/* backdrop for mobile drawer */}
       <div
         onClick={() => setOpen(false)}
         className={`fixed inset-0 bg-black/40 z-20 md:hidden transition-opacity ${open ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+        aria-hidden={!open}
       />
 
-      <aside className={`z-30 transform top-0 left-0 bg-white w-full md:w-80 h-full border-r
-        fixed md:relative transition-transform ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-        <div className="p-4 border-b flex items-center gap-3">
+      <aside
+        className={`z-30 transform top-0 left-0 bg-white w-full md:w-80 h-full border-r
+          fixed md:relative transition-transform flex flex-col ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+        aria-hidden={!open && typeof window !== 'undefined' && window.innerWidth < 768}
+      >
+        <div className="p-3 md:p-4 border-b flex items-center gap-3">
           <div className="font-bold text-lg">Chats</div>
           <div className="flex-1">
             <input
@@ -34,23 +40,30 @@ export default function Sidebar({ chats, activeWA, onSelect, open, setOpen }) {
               onChange={e=>setQ(e.target.value)}
               className="w-full bg-gray-100 rounded px-3 py-2 text-sm"
               placeholder="Search or start new chat"
+              aria-label="Search chats"
             />
           </div>
         </div>
 
-        <div className="overflow-auto h-[calc(100vh-64px)]">
-          {filtered.length === 0 ? (
-            <div className="p-6 text-gray-500">No chats</div>
-          ) : (
-            filtered.map(c => (
-              <ChatListItem
-                key={c.wa_id}
-                chat={c}
-                active={c.wa_id === activeWA}
-                onClick={() => onSelect(c.wa_id)}
-              />
-            ))
-          )}
+        <div className="overflow-auto flex-1 min-h-0">
+          <div className="h-full">
+            {filtered.length === 0 ? (
+              <div className="p-6 text-gray-500">No chats</div>
+            ) : (
+              filtered.map(c => (
+                <ChatListItem
+                  key={c.wa_id}
+                  chat={c}
+                  active={c.wa_id === activeWA}
+                  onClick={() => {
+                    onSelect(c.wa_id);
+                    // auto-close on mobile
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) setOpen(false);
+                  }}
+                />
+              ))
+            )}
+          </div>
         </div>
       </aside>
     </>

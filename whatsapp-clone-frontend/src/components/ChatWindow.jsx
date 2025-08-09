@@ -176,7 +176,7 @@ export default function ChatWindow({ wa_id }) {
         </div>
         <div className="p-3 border-t bg-white">
           <div className="flex gap-2">
-            <input className="flex-1 border rounded px-3 py-2" placeholder="Type a message" disabled />
+            <input className="flex-1 border rounded px-3 py-2 text-sm" placeholder="Type a message" disabled />
             <button className="px-4 py-2 bg-green-600 text-white rounded" disabled>Send</button>
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function ChatWindow({ wa_id }) {
 
   return (
     <main data-chat-window className="flex-1 flex flex-col bg-white min-h-0">
-      <div ref={boxRef} className="flex-1 overflow-auto p-6 bg-gray-50 flex flex-col gap-3 min-h-0">
+      <div ref={boxRef} className="flex-1 overflow-auto p-4 sm:p-6 bg-gray-50 flex flex-col gap-3 min-h-0">
         {msgs.length === 0 ? (
           <div className="text-center text-gray-400 mt-10">No messages yet</div>
         ) : (
@@ -201,16 +201,23 @@ export default function ChatWindow({ wa_id }) {
         )}
       </div>
 
-      <div className="p-3 border-t bg-white">
-        <div className="flex gap-2">
+      <div className="p-3 sm:p-4 border-t bg-white">
+        <div className="flex gap-2 items-center">
           <input
-            className="flex-1 border rounded px-3 py-2"
+            className="flex-1 border rounded px-3 py-2 text-sm min-w-0"
             value={text}
             onChange={e => setText(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send()}
             placeholder="Type a message"
+            aria-label="Message input"
           />
-          <button className="px-4 py-2 bg-green-600 text-white rounded" onClick={send}>Send</button>
+          <button
+            className="px-4 py-2 bg-green-600 text-white rounded text-sm flex items-center justify-center"
+            onClick={send}
+            aria-label="Send message"
+          >
+            Send
+          </button>
         </div>
       </div>
     </main>

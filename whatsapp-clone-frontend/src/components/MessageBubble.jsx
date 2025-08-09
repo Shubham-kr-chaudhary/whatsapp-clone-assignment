@@ -52,9 +52,9 @@ export default function MessageBubble({ msg, own }) {
     <div
       className={`inline-block p-3 rounded-lg shadow-sm
         ${own ? 'bg-green-100 text-black rounded-tr-none' : 'bg-white text-gray-800 rounded-tl-none'}
-        max-w-[75%] md:max-w-[60%]`}
+        max-w-[85%] sm:max-w-[75%] md:max-w-[60%]`}
     >
-      <div className="whitespace-pre-wrap">{msg.text}</div>
+      <div className="whitespace-pre-wrap break-words text-sm">{msg.text}</div>
       <div className="mt-1 flex items-center justify-end gap-2">
         <div className="text-xs text-gray-500">{time}</div>
         {own ? <div className="flex items-center"><StatusIcon status={msg.status} /></div> : null}

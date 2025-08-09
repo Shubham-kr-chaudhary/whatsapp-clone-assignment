@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
@@ -8,15 +9,17 @@ export default function App() {
   const [chats, setChats] = useState([]);
   const [activeWA, setActiveWA] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const BASE = import.meta.env.VITE_API_URL || "";
 
-  // Detect mobile
+  // Detect mobile (kept for behaviour control)
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(max-width: 767px)");
     function onChange(e) {
       setIsMobile(e.matches);
+      if (e.matches) setSidebarOpen(true); // show list or drawer by default on mobile
     }
     setIsMobile(mq.matches);
     mq.addEventListener ? mq.addEventListener("change", onChange) : mq.addListener(onChange);
@@ -59,6 +62,7 @@ export default function App() {
 
   function handleSelectChat(wa) {
     setActiveWA(wa);
+    if (isMobile) setSidebarOpen(false);
   }
 
   const activeChat = chats.find(c => c.wa_id === activeWA);
@@ -66,7 +70,7 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen bg-gray-100">
-      {/* MOBILE: show only sidebar OR only chat */}
+      {/* MOBILE: show either sidebar (drawer) or chat */}
       {isMobile ? (
         !activeWA ? (
           <div className="h-full w-full">
@@ -74,8 +78,8 @@ export default function App() {
               chats={chats}
               activeWA={activeWA}
               onSelect={handleSelectChat}
-              open={true}
-              setOpen={() => {}}
+              open={sidebarOpen}
+              setOpen={setSidebarOpen}
             />
           </div>
         ) : (
@@ -102,7 +106,7 @@ export default function App() {
             open={true}
             setOpen={() => {}}
           />
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0">
             {activeWA && (
               <Header
                 title={headerTitle}
@@ -133,3 +137,4 @@ export default function App() {
     </div>
   );
 }
+
